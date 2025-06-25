@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Reversi_game.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="850"
+        x:Class="Reversi_game.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        
+        Background="rgba(0, 10, 0, 0.6)"
+        TransparencyBackgroundFallback="Black"
+        Title="Reversi">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+        
+    </Design.DataContext>
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Margin="20, 40 ,20 ,15" 
+                   FontSize="38"
+                   Text="{Binding Greeting}" 
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        
+        
+        <ItemsControl Margin="20"
+                      ItemsSource="{Binding TileList}">
+
+            <ItemsControl.ItemsPanel >
+                <ItemsPanelTemplate>
+                    <UniformGrid Background="rgba(79, 47, 25, 0.8)"
+                                  Columns="{Binding GridRows}" Rows="{Binding GridRows}"
+                                  Width="{Binding GridSizePx}" Height="{Binding GridSizePx}" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    
+                    <Border Margin="1,1,1,1"
+                            BorderBrush="Gray" BorderThickness="1"
+                            Padding="5">
+                        
+                        <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"> -->
+                            <!-- <Rectangle Fill="{Binding TileColor}" Width="5"></Rectangle> -->
+                            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding TileSize}" Height="{Binding TileSize}"
+                                    Command="{Binding Tile_Click}"
+                                    Background="Transparent">
+                                <Ellipse Name="Ellipse" Width="35" Height="35" Fill="{Binding ColorName}"></Ellipse>
+                            </Button>
+                        <!-- </StackPanel> -->
+                    </Border>
+                        
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            
+        </ItemsControl>
+        
+        
+        <Grid ColumnDefinitions="4*,Auto,3*,Auto,4*"
+              VerticalAlignment="Center" Margin="0, 20, 0, 0">
+
+            <TextBlock  Grid.Column="1" 
+                       Text="{Binding TurnString}"
+                       VerticalAlignment="Center"
+                       FontSize="21"/>
+            
+            <CheckBox Grid.Column="3" FontSize="20"  
+                      IsChecked="{Binding EnemyBotEnabled}">
+                 Replace second player with bot
+            </CheckBox>
+            
+        </Grid>
+        
+        
+    </StackPanel>
+
+</Window>
