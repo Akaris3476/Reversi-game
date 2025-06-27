@@ -61,9 +61,11 @@ public partial class MainWindowViewModel : ViewModelBase
             
             availableTiles.Add(tile.Coordinate);
         }
+        
+        if (availableTiles.Count == 0) return;
+        
 
         Random rnd = new();
-        
         int randomIndex = rnd.Next(availableTiles.Count);
 
         foreach (var tile in TileList)

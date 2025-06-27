@@ -143,13 +143,13 @@ public partial class Tile : ViewModelBase
 		
 			foreach (var tile in tileList)
 			{
+				
 				if (tile.TileColor == ColorEnum.Black)
-				{
 					blackTilesCount++;
-				} else if (tile.TileColor == ColorEnum.White)
-				{
+				
+				if (tile.TileColor == ColorEnum.White)
 					whiteTilesCount++;
-				}
+				
 			}
 
 			//send players results and end the game
