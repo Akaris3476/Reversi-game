@@ -7,7 +7,7 @@
         x:Class="Reversi_game.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         
-        Background="rgba(0, 10, 0, 0.6)"
+        Background="rgba(4, 28, 12, 1)"
         TransparencyBackgroundFallback="Black"
         Title="Reversi">
 
@@ -21,6 +21,7 @@
     <StackPanel Orientation="Vertical">
         <TextBlock Margin="20, 40 ,20 ,15" 
                    FontSize="38"
+                   Foreground="White"
                    Text="{Binding Greeting}" 
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
         
@@ -30,7 +31,7 @@
 
             <ItemsControl.ItemsPanel >
                 <ItemsPanelTemplate>
-                    <UniformGrid Background="rgba(79, 47, 25, 0.8)"
+                    <UniformGrid Background="rgba(79, 47, 25, 1)"
                                   Columns="{Binding GridRows}" Rows="{Binding GridRows}"
                                   Width="{Binding GridSizePx}" Height="{Binding GridSizePx}" />
                 </ItemsPanelTemplate>
@@ -65,9 +66,11 @@
             <TextBlock  Grid.Column="1" 
                        Text="{Binding TurnString}"
                        VerticalAlignment="Center"
+                       Foreground="White"
                        FontSize="21"/>
             
             <CheckBox Grid.Column="3" FontSize="20"  
+                      Foreground="White"
                       IsChecked="{Binding EnemyBotEnabled}">
                  Replace second player with bot
             </CheckBox>
