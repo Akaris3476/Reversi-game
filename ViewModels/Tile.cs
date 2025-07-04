@@ -27,7 +27,7 @@ public partial class Tile : ViewModelBase
 		_parentWindow = parentWindow;
 		TileSize = _parentWindow.GridSizePx / _parentWindow.GridRows ;
 		TileColor = tile.TileColor;
-		_directions = new List<(DirectionsEnum direction, int EnemyTilesCount)>(tile.Directions);
+		PossibleReverseDirections = new List<DirectionsEnum>(tile.PossibleReverseDirections);
 	}
 	
 	public enum ColorEnum { Black, White, Blank, Available }
@@ -74,12 +74,12 @@ public partial class Tile : ViewModelBase
 		}
 		_parentWindow.TurnCount++;
 		
-		if (_directions.Count > 0) //flip line if possible
+		if (PossibleReverseDirections.Count > 0) //flip line if possible
 		{
 			
-			foreach (var direction in _directions)
+			foreach (var direction in PossibleReverseDirections)
 			{
-				ReverseLine(direction.direction);
+				ReverseLine(direction);
 			}
 		}
 		
@@ -148,23 +148,9 @@ public partial class Tile : ViewModelBase
 
 
 	public enum DirectionsEnum { Up, Down, Left, Right, UpperLeft, UpperRight, LowerLeft, LowerRight }
-	private List<(DirectionsEnum direction, int EnemyTilesCount)> _directions = new();
+	public List<DirectionsEnum> PossibleReverseDirections { get; set; } = new();
+	
 
-	public List<(DirectionsEnum direction, int EnemyTilesCount)> Directions => _directions;
-
-	public int Value
-	{
-		get
-		{
-			if (TileColor != ColorEnum.Available) return -1;
-			int valueSum = 0;
-			foreach (var direction in _directions)
-			{
-				valueSum += direction.EnemyTilesCount;
-			}
-			return valueSum;
-		} 
-	}
 	
 	//checks possibility of a turn on specific tile so it can be painted green
 	private bool CanBeFliped(Point coordinate) 
@@ -177,8 +163,7 @@ public partial class Tile : ViewModelBase
 		var enemyTile = _parentWindow.Turn ? ColorEnum.Black : ColorEnum.White; 
 		var friendlyTile = _parentWindow.Turn ? ColorEnum.White : ColorEnum.Black;
 		
-		_directions = new();
-		int enemyTilesCount = 0;
+		PossibleReverseDirections = new();
 		
 		//each for loop beams point in different direction and checks for enemy plus friendly tiles on the way
 		//so at least one enemy tile can be reversed
@@ -192,15 +177,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.UpperRight, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.UpperRight);
 		}
 
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 		
 		//up and left
 		for (Point p = new(coordinate.X - 1, coordinate.Y - 1);
@@ -211,15 +195,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.UpperLeft, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.UpperLeft);
 		}
 
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 		
 		//right
 		for (Point p = new(coordinate.X + 1, coordinate.Y);
@@ -230,15 +213,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.Right, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.Right);
 		}
 		
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 
 		//left
 		for (Point p = new(coordinate.X - 1, coordinate.Y);
@@ -249,15 +231,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.Left, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.Left);
 		}
 		
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 
 		//up
 		for (Point p = new(coordinate.X, coordinate.Y - 1);
@@ -268,15 +249,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.Up, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.Up);
 		}
 		
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 
 		//down
 		for (Point p = new(coordinate.X, coordinate.Y + 1);
@@ -287,15 +267,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.Down, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.Down);
 		}
 
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 
 		//down and left
 		for (Point p = new(coordinate.X - 1, coordinate.Y + 1);
@@ -306,15 +285,14 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.LowerLeft, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.LowerLeft);
 		}
 		
 		enemyTileOnTheWay = false;
-		enemyTilesCount = 0;
 
 		//down and right
 		for (Point p = new(coordinate.X + 1, coordinate.Y +1);
@@ -325,11 +303,11 @@ public partial class Tile : ViewModelBase
 			// stop if there is already available tile
 			if (pTile.TileColor == ColorEnum.Available || pTile.TileColor == ColorEnum.Blank) break;
 			//mark if there enemy tile on the way
-			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; enemyTilesCount++; continue; } 
+			if (pTile.TileColor == enemyTile) { enemyTileOnTheWay = true; continue; } 
 			//there is friendly tile on the way but no enemy
 			if (pTile.TileColor == friendlyTile && !enemyTileOnTheWay) break;
 			//friendly tile after enemy
-			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) _directions.Add((DirectionsEnum.LowerRight, enemyTilesCount));
+			if (enemyTileOnTheWay && pTile.TileColor == friendlyTile) PossibleReverseDirections.Add(DirectionsEnum.LowerRight);
 		}
 		
 		
@@ -337,7 +315,7 @@ public partial class Tile : ViewModelBase
 
 		
 
-		return _directions.Count > 0 ;
+		return PossibleReverseDirections.Count > 0 ;
 	}
 
 	private void ReverseLine(DirectionsEnum direction)

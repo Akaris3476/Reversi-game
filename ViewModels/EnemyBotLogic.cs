@@ -36,7 +36,7 @@ public partial class MainWindowViewModel
 	
 	
 	public enum DifficultyEnum { Easy, Medium, Hard }
-	private DifficultyEnum _difficulty = DifficultyEnum.Medium;
+	private DifficultyEnum _difficulty;
 	
 	public bool EasyDifficulty
 	{
@@ -46,10 +46,14 @@ public partial class MainWindowViewModel
 			_botType = BotTypeEnum.Minimax;
 		}
 	} 
+	
+	private bool _mediumDifficulty;
 	public bool MediumDifficulty
 	{
+		get => _mediumDifficulty;
 		set
 		{
+			_mediumDifficulty = value;
 			_difficulty = DifficultyEnum.Medium;
 			_botType = BotTypeEnum.Minimax;
 		}
@@ -58,6 +62,8 @@ public partial class MainWindowViewModel
 	{
 		set
 		{
+			Console.WriteLine("meow2");
+			
 			_difficulty = DifficultyEnum.Hard;
 			_botType = BotTypeEnum.Minimax;
 		}
@@ -107,7 +113,9 @@ public partial class MainWindowViewModel
 	{
 		List<Tile> availableTilesList = GetAvailableTiles();
 		List<(Tile Tile, int Value)> turnsValuesList = new();
-                        
+
+		Console.Write("Enemy's each turn value: "); //more value - better for white, and vice versa
+		
 		foreach (var tile in  availableTilesList)
 		{
 			var newPos = new MainWindowViewModel(this);
@@ -131,16 +139,28 @@ public partial class MainWindowViewModel
 			{
 				case DifficultyEnum.Easy:
 					Console.WriteLine("Difficulty: easy");
+					
 					turnsValuesList.First().Tile.Tile_Click();
+					
+					Console.WriteLine("Chosen turn's value: "+ turnsValuesList.First().Value);
 					break;
+				
 				case DifficultyEnum.Medium:
 					Console.WriteLine("Difficulty: medium");
-					int index = turnsValuesList.Count() / 2;
+					
+					//works like Math.Floor. When .Count() is even, result is middle upper index
+					int index = turnsValuesList.Count() / 2; 
 					turnsValuesList[index].Tile.Tile_Click();	
+					
+					Console.WriteLine("Chosen turn's value: "+ turnsValuesList[index].Value);
 					break;
+				
 				case DifficultyEnum.Hard:
 					Console.WriteLine("Difficulty: hard");
+					
 					turnsValuesList.Last().Tile.Tile_Click();
+					
+					Console.WriteLine("Chosen turn's value: "+ turnsValuesList.Last().Value);
 					break;
 			}
 		}

@@ -7,7 +7,7 @@
         x:Class="Reversi_game.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         
-        Background="rgba(4, 28, 12, 1)"
+        Background="rgba(2, 18, 7, 1)"
         TransparencyBackgroundFallback="Black"
         Title="Reversi">
 

@@ -127,6 +127,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
         
+        MediumDifficulty = true;
         
         TileList[0].UpdateGridAvailable();
 
