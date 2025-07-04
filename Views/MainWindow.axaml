@@ -60,7 +60,7 @@
         </ItemsControl>
         
         
-        <Grid ColumnDefinitions="4*,Auto,3*,Auto,4*"
+        <Grid ColumnDefinitions="4*,Auto,2*,Auto,2*,Auto,4*"
               VerticalAlignment="Center" Margin="0, 20, 0, 0">
 
             <TextBlock  Grid.Column="1" 
@@ -75,6 +75,19 @@
                  Replace second player with bot
             </CheckBox>
             
+            <StackPanel Grid.Column="5">
+                <TextBlock Margin=" 0, 0, 0, 10" Foreground="White" FontSize="20">Difficulty:</TextBlock>
+                <RadioButton Foreground="White" GroupName="BotDifficulty" FontSize="20" 
+                             Content="Random Bot" IsChecked="{Binding RandomBot }"/>
+                <RadioButton Foreground="White" GroupName="BotDifficulty" FontSize="20" 
+                             Content="Easy" IsChecked="{Binding EasyDifficulty}"/>
+                <RadioButton Foreground="White" GroupName="BotDifficulty" FontSize="20" 
+                             Content="Medium" IsChecked="{Binding MediumDifficulty}"/>
+                <RadioButton Foreground="White" GroupName="BotDifficulty" FontSize="20" 
+                             Content="Hard" IsChecked="{Binding HardDifficulty}"/>
+            </StackPanel>
+  
+           
         </Grid>
         
         

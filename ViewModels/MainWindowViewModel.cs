@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
-
+using System.Linq;
 
 namespace Reversi_game.ViewModels;
 
@@ -12,25 +11,13 @@ public partial class MainWindowViewModel : ViewModelBase
     public int GridRows{ get; } = 8;
     public int GridSizePx { get; } = 600;
 
-    public List<Point> Center4Tiles;
+    public readonly List<Point> Center4Tiles;
     
     public int TurnCount = 0;
         
     private bool _turn; //false == black, true == white
-
-    private bool _enemyBotEnabled = true;
-    public bool EnemyBotEnabled
-    {
-        get => _enemyBotEnabled;
-        set
-        {
-            _enemyTurn = !_turn;
-            _enemyBotEnabled = value;
-        }
-        
-    }
-    private bool _enemyTurn = true;
-
+    
+    
     public bool Turn
     {
         get => _turn;
@@ -40,58 +27,59 @@ public partial class MainWindowViewModel : ViewModelBase
 		    TileList[0].UpdateGridAvailable();
             
             
-            if (EnemyBotEnabled && _enemyTurn == _turn)
+            if (EnemyBotEnabled && _enemyTurn == _turn && _gameOver == false)
             {
-                
-                EnemyRandomTurn();
+
+                switch (_botType)
+                {
+                    case BotTypeEnum.Minimax:
+                        Console.WriteLine("Bot: minimax");
+                        EnemyMinmaxTurn();
+                        break;
+                    case BotTypeEnum.Random:
+                        Console.WriteLine("Bot: random");
+                        EnemyRandomTurn();
+                        break;
+                }
                 
             }
         }
     }
+    
 
-    private void EnemyRandomTurn()
-    {
-        
-        List<Point> availableTiles = new();
-        
-        
-        foreach (var tile in  TileList)
-        {
-            if (tile.TileColor != Tile.ColorEnum.Available) continue;
-            
-            availableTiles.Add(tile.Coordinate);
-        }
-        
-        if (availableTiles.Count == 0) return;
-        
-
-        Random rnd = new();
-        int randomIndex = rnd.Next(availableTiles.Count);
-
-        foreach (var tile in TileList)
-        {
-            if (tile.Coordinate != availableTiles[randomIndex]) continue;
-            
-            
-            tile.Tile_Click();
-        }
-
-    }
     
     
     private bool _gameOver;
     
-    public Tile.ColorEnum Winner;
+    public Tile.ColorEnum Winner = Tile.ColorEnum.Blank;
     
     private int _finalWhiteTilesCount;
     private int _finalBlackTilesCount;
 
-    public void SetGameResults(int whiteTilesCount, int blackTilesCount)
+    public void InitiateGameEnd()
     {
-        _finalBlackTilesCount = blackTilesCount;
-        _finalWhiteTilesCount = whiteTilesCount;
         _gameOver = true;
-        if (blackTilesCount > whiteTilesCount)
+        Console.WriteLine("END GAME!!");
+			
+        _finalBlackTilesCount = 0;
+        _finalWhiteTilesCount = 0;
+		
+        foreach (var tile in TileList)
+        {
+				
+            if (tile.TileColor == Tile.ColorEnum.Black)
+                _finalBlackTilesCount++;
+				
+            if (tile.TileColor == Tile.ColorEnum.White)
+                _finalWhiteTilesCount++;
+				
+        }
+        
+        SetGameResults();
+    }
+    private void SetGameResults()
+    {
+        if (_finalBlackTilesCount > _finalWhiteTilesCount)
         {
             Winner = Tile.ColorEnum.Black;
         }
@@ -116,21 +104,18 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
 
-        void FillCenter4TilesList()
-        {
-            Point upperLeft = new(GridRows/2 - 1 , GridRows/2 - 1);
-            Point upperRight = new(GridRows/2, GridRows/2 - 1);
-            Point downLeft = new(GridRows/2 - 1, GridRows/2);
-            Point downRight = new(GridRows/2, GridRows/2);
 
-            Center4Tiles = new List<Point>
-            {
-                upperLeft, upperRight,
-                downLeft, downRight
-            };
-        }
-        FillCenter4TilesList();
-        
+        Point upperLeft = new(GridRows/2 - 1 , GridRows/2 - 1);
+        Point upperRight = new(GridRows/2, GridRows/2 - 1);
+        Point downLeft = new(GridRows/2 - 1, GridRows/2);
+        Point downRight = new(GridRows/2, GridRows/2);
+
+        Center4Tiles = new List<Point>
+        {
+            upperLeft, upperRight,
+            downLeft, downRight
+        };
+
         
         TileList = new ObservableCollection<Tile>();
 
@@ -148,6 +133,26 @@ public partial class MainWindowViewModel : ViewModelBase
 
     }
 
+
+    public MainWindowViewModel(MainWindowViewModel window)
+    {
+
+        EnemyBotEnabled = false;
+        Center4Tiles = new List<Point>(window.Center4Tiles);
+        
+        TileList = new ObservableCollection<Tile>();
+
+        foreach (var tile in window.TileList)
+        {
+            TileList.Add(new Tile(tile, this));
+        }
+        
+        
+        TurnCount = window.TurnCount;
+        _botType = window._botType;
+        Turn = window.Turn;
+
+    }
 
 
 }
