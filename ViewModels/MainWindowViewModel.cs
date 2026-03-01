@@ -29,7 +29,7 @@ public partial class MainWindowViewModel : ViewModelBase
             
             if (EnemyBotEnabled && _enemyTurn == _turn && _gameOver == false)
             {
-
+                Console.WriteLine();
                 switch (_botType)
                 {
                     case BotTypeEnum.Minimax:
